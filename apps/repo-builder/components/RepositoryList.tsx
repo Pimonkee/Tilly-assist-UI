@@ -192,7 +192,7 @@ export function RepositoryList() {
         {repositories.length === 0 && !loading && !error && (
           <div className="rounded-lg bg-white p-8 text-center shadow-md">
             <p className="text-zinc-600">
-              Click "Fetch Repositories" to load repositories from the Pimonkee
+              Click &quot;Fetch Repositories&quot; to load repositories from the Pimonkee
               profile
             </p>
           </div>

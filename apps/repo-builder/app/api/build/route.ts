@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
           message: `Build triggered for ${repoName}`,
           workflow: workflow.name,
         });
-      } catch (dispatchError: any) {
+      } catch {
         return NextResponse.json({
           success: false,
           message: `Workflow found but manual trigger not enabled: ${workflow.name}`,
