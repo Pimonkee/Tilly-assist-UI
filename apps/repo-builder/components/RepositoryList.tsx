@@ -48,7 +48,7 @@ export function RepositoryList() {
     }
   };
 
-  const triggerBuild = async (repoName: string, owner: string) => {
+  const triggerBuild = async (repoName: string, owner: string, defaultBranch: string) => {
     setBuildStatus((prev) => ({
       ...prev,
       [repoName]: { status: "building", message: "Triggering build..." },
@@ -60,7 +60,7 @@ export function RepositoryList() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ repoName, owner }),
+        body: JSON.stringify({ repoName, owner, defaultBranch }),
       });
 
       const data = await response.json();
@@ -161,7 +161,7 @@ export function RepositoryList() {
                 <button
                   onClick={() => {
                     const [owner, repoName] = repo.full_name.split("/");
-                    triggerBuild(repoName, owner);
+                    triggerBuild(repoName, owner, repo.default_branch);
                   }}
                   disabled={buildStatus[repo.name]?.status === "building"}
                   className="w-full rounded-lg bg-green-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-green-700 disabled:opacity-50"

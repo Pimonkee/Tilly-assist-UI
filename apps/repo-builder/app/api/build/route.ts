@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest";
 
 export async function POST(request: NextRequest) {
   try {
-    const { repoName, owner } = await request.json();
+    const { repoName, owner, defaultBranch } = await request.json();
 
     if (!repoName || !owner) {
       return NextResponse.json(
@@ -12,8 +12,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const token = process.env.GITHUB_TOKEN;
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: "GitHub token not configured. Please set GITHUB_TOKEN in environment variables." },
+        { status: 500 }
+      );
+    }
+
     const octokit = new Octokit({
-      auth: process.env.GITHUB_TOKEN,
+      auth: token,
     });
 
     // Check if repository has GitHub Actions workflows
@@ -33,13 +42,14 @@ export async function POST(request: NextRequest) {
 
       // Trigger the first workflow found
       const workflow = workflows.workflows[0];
+      const branch = defaultBranch || "main";
       
       try {
         await octokit.actions.createWorkflowDispatch({
           owner,
           repo: repoName,
           workflow_id: workflow.id,
-          ref: "main", // or "master" depending on default branch
+          ref: branch,
         });
 
         return NextResponse.json({
@@ -47,7 +57,8 @@ export async function POST(request: NextRequest) {
           message: `Build triggered for ${repoName}`,
           workflow: workflow.name,
         });
-      } catch {
+      } catch (dispatchError) {
+        console.error("Workflow dispatch error:", dispatchError);
         return NextResponse.json({
           success: false,
           message: `Workflow found but manual trigger not enabled: ${workflow.name}`,

@@ -3,8 +3,17 @@ import { Octokit } from "@octokit/rest";
 
 export async function GET() {
   try {
+    const token = process.env.GITHUB_TOKEN;
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: "GitHub token not configured. Please set GITHUB_TOKEN in environment variables." },
+        { status: 500 }
+      );
+    }
+
     const octokit = new Octokit({
-      auth: process.env.GITHUB_TOKEN,
+      auth: token,
     });
 
     const username = "Pimonkee";
