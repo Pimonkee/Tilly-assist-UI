@@ -19,6 +19,22 @@
 
 - [⭐️ Star us on GitHub](https://github.com/assistant-ui/assistant-ui)
 
+## 🚀 Tilly Repository Builder
+
+This repository has been enhanced with a **Repository Builder UI** - a web application for managing and building all repositories under the Pimonkee profile.
+
+**[📖 View Tilly Repository Builder Documentation](./REPO_BUILDER.md)**
+
+Features:
+- 🔍 Browse all Pimonkee repositories
+- 🏗️ Trigger builds via GitHub Actions
+- 📊 View repository metadata and statistics
+- 🎨 Modern, responsive UI
+
+Quick start: `cd apps/repo-builder && pnpm dev`
+
+---
+
 ## The UX of ChatGPT in your React app 💬🚀
 
 **assistant-ui** is an open source TypeScript/React library to build production-grade AI chat experiences fast.
