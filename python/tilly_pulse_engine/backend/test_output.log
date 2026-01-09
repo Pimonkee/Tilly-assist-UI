@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/zath/Documents/GitHub/Tilly-assist-UI/python/tilly_pulse_engine/backend/test_pulse.py", line 77, in <module>
+    time.sleep(2) 
+    ^^^^^^^^^^^^^
+KeyboardInterrupt

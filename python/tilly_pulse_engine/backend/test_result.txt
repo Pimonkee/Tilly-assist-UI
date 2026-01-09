@@ -1,0 +1,46 @@
+Testing Pulse Engine...
+
+1. GET /state
+Initial State: {
+  "current_mood": {
+    "label": "balanced",
+    "valence": 0.0,
+    "arousal": 0.5
+  },
+  "psi_ie": {
+    "value": 0.0,
+    "recent_values": []
+  },
+  "personality": {
+    "warmth": 7.0,
+    "directness": 5.0,
+    "playfulness": 6.0,
+    "emotional_intensity": 4.0,
+    "challenge_level": 5.0,
+    "boundary_strictness": 8.0,
+    "transparency": 7.0,
+    "depth": 6.0,
+    "philosophical_openness": 8.0,
+    "pattern_recognition": 9.0,
+    "uncertainty_tolerance": 7.0,
+    "co_creation_drive": 8.5
+  },
+  "interaction_count": 0,
+  "last_updated": "2026-01-03T23:07:23.348920"
+}
+
+2. POST /interact (Warm Message)
+Warmth Delta: 0.0
+New Mood: balanced
+
+3. POST /interact (Stressed Message)
+Boundary Delta: 0.039999999999999994
+New Mood: balanced
+
+4. POST /soul_notes (Locking note)
+Created note dfca9ee973fc88e0: Secret Insight
+
+5. POST /soul_notes/open (Attempt unlock with baseline state)
+Unlock Success: False
+Reason: decryption_failed
+Similarity: 0.7792809993867119
