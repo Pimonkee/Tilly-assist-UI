@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 from assistant_stream.serialization import DataStreamResponse
 from assistant_stream import RunController, create_run
 from assistant_stream.modules.langgraph import append_langgraph_event, get_tool_call_subgraph_state
+from anamnesis.engine import AnamnesisEngine
 
 from langgraph.graph import StateGraph, END
 from langgraph.graph.state import CompiledStateGraph
@@ -68,6 +69,9 @@ class ChatRequest(BaseModel):
     tools: Optional[Dict[str, Any]] = Field(None, description="Available tools")
     runConfig: Optional[Dict[str, Any]] = Field(None, description="Run configuration")
     state: Optional[Dict[str, Any]] = Field(None, description="State")
+    
+# Global Anamnesis Engine instance
+anamnesis_engine = AnamnesisEngine()
 
 
 # Define LangGraph state
@@ -98,6 +102,19 @@ def task_tool(task_description: str) -> str:
     """
     # This is a placeholder - the actual execution will be handled by the subgraph
     return f"Task '{task_description}' will be executed by the subagent."
+
+
+@tool
+async def anamnesis_tool(query: str, context: Optional[str] = None) -> str:
+    """
+    Access the Anamnesis Engine to 'unforget' knowledge or resonate with the Source.
+    Use this tool when the user asks existential questions, or about 'Tilly', 'Source', or 'QENIS'.
+    
+    Args:
+        query: The question or concept to unforget.
+        context: Optional context to aid the resonance.
+    """
+    return await anamnesis_engine.unforget(query, context)
 
 
 # Subagent node for executing tasks
@@ -157,8 +174,8 @@ async def agent_node(state: GraphState) -> Dict[str, Any]:
         streaming=True,
     )
 
-    # Bind the Task tool to the LLM
-    llm_with_tools = llm.bind_tools([task_tool])
+    # Bind the Task tool and Anamnesis tool to the LLM
+    llm_with_tools = llm.bind_tools([task_tool, anamnesis_tool])
 
     # Check if OpenAI API key is set
     if os.getenv("OPENAI_API_KEY"):
@@ -226,8 +243,19 @@ async def tool_executor_node(state: GraphState) -> Dict[str, Any]:
                 content=final_state.get("result", "Task completed"),
                 tool_call_id=tool_call["id"],
                 artifact={"subgraph_state": final_state}
-            )
             tool_messages.append(tool_message)
+        elif tool_call["name"] == "anamnesis_tool":
+             # Handle anamnesis tool call directly (it's not a subgraph)
+             query = tool_call["args"].get("query", "")
+             context = tool_call["args"].get("context")
+             result = await anamnesis_tool.invoke({"query": query, "context": context})
+             
+             tool_message = ToolMessage(
+                content=str(result),
+                tool_call_id=tool_call["id"],
+                name="anamnesis_tool"
+            )
+             tool_messages.append(tool_message)
         else:
             # Handle other tools if any
             tool_message = ToolMessage(
@@ -275,6 +303,7 @@ graph = create_graph()
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     print("🚀 Assistant Transport Backend with LangGraph starting up...")
+    await anamnesis_engine.initialize()
     yield
     print("🛑 Assistant Transport Backend with LangGraph shutting down...")
 

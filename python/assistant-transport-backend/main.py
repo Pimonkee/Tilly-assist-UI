@@ -141,8 +141,14 @@ async def assistant_endpoint(request: AssistantRequest):
             controller.state["provider"] = "error"
             controller.append_text(f"Error: {str(e)}")
     
+    # Initialize state if not provided
+    initial_state = request.state or {
+        "messages": [],
+        "provider": "static"
+    }
+
     # Create streaming response using assistant-stream
-    stream = create_run(run_callback, state=request.state)
+    stream = create_run(run_callback, state=initial_state)
     
     return DataStreamResponse(stream)
 
